@@ -37,9 +37,9 @@ user="wpuser"
 pass="admin"
 dbname="wordpress"
 echo "create db name"
-#mysql -e "CREATE DATABASE $dbname;"
+mysql -e "CREATE DATABASE $dbname;"
 echo "Creating new user..."
-#mysql -e "CREATE USER '$user'@'%' IDENTIFIED BY '$pass';"
+mysql -e "CREATE USER '$user'@'%' IDENTIFIED BY '$pass';"
 echo "User successfully created!"
 echo "Granting ALL privileges on $dbname to $user!"
 mysql -e "GRANT ALL PRIVILEGES ON $dbname.* TO '$user'@'%';"
@@ -68,7 +68,7 @@ perl -pi -e "s/database_name_here/$dbname/g" wp-config.php
 perl -pi -e "s/username_here/$user/g" wp-config.php
 perl -pi -e "s/password_here/$pass/g" wp-config.php
 sudo chown www-data:www-data /usr/share/nginx/wordpress -R
-#sudo rm /etc/nginx/sites-enabled/default
+sudo rm /etc/nginx/sites-enabled/default
 
 
 #create uploads folder and set permissions
@@ -142,3 +142,12 @@ fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
 EOF
 
 systemctl reload nginx 
+
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+chmod +x wp-cli.phar
+sudo mv wp-cli.phar /usr/local/bin/wp
+wp --info
+cd /usr/share/nginx/wordpress
+wp core install --url=192.168.56.54 --title=wp_test --admin_user=admin --admin_email=admin@admin.admin --admin_password=!2three456. --path=/usr/share/nginx/wordpress --skip-email --allow-root
+wp theme install twentynineteen --activate --allow-root 
+systemctl restart nginx
